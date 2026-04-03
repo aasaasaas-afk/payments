@@ -19,7 +19,7 @@ def create_payment(user_id: str):
     }
 
     data = {
-        "amount": 1,                     # ✅ $1
+        "amount": 10,                     # ✅ $1
         "currency": "USD",
         "pay_currency": "USDT",          # receive in USDT
         "network": "BSC",                # ✅ BSC (BEP20)
