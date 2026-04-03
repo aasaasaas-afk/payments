@@ -17,7 +17,7 @@ def create_payment(user_id: str, pay_currency: str):
     url = "https://api.nowpayments.io/v1/payment"
 
     data = {
-        "price_amount": 5,
+        "price_amount": 10,
         "price_currency": "usd",
         "pay_currency": pay_currency,
         "order_id": user_id,
