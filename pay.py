@@ -1,51 +1,51 @@
 # =========================
-# pay.py (OXAPAY VERSION)
+# pay.py (OXAPAY INVOICE VERSION)
 # =========================
 
 import requests
+import json
 
 API_KEY = "NLQIPG-8SOFHX-VPRQZ5-MQA7H9"
 
 
-# 🔥 Create payment (returns address + amount + trackId)
-def create_payment(user_id: str, network: str):
-    url = "https://api.oxapay.com/v1/payment"
+# 🔥 Create invoice (returns payment_url + track_id)
+def create_payment(user_id: str):
+    url = "https://api.oxapay.com/v1/payment/invoice"
 
-    data = {
-        "merchant": API_KEY,
-        "amount": 1,  # ✅ you can keep low amount here (1–5 works)
-        "currency": "USD",
-        "lifeTime": 30,
-        "feePaidByPayer": 1,
-        "underPaidCover": 2,
-        "description": f"User {user_id} payment"
+    headers = {
+        "merchant_api_key": API_KEY,
+        "Content-Type": "application/json",
+        "User-Agent": "Mozilla/5.0"
     }
 
-    # 🔥 Network handling
-    if network == "trc20":
-        data["network"] = "TRC20"
-        data["currency"] = "USDT"
-    elif network == "bep20":
-        data["network"] = "BEP20"
-        data["currency"] = "USDT"
+    data = {
+        "amount": 1,  # ✅ low amount works
+        "currency": "USD",
+        "lifetime": 30,
+        "fee_paid_by_payer": 1,
+        "under_paid_coverage": 2,
+        "to_currency": "USDT",
+        "order_id": user_id,
+        "description": f"User {user_id} payment",
+        "sandbox": False
+    }
 
     try:
-        r = requests.post(url, json=data)
+        r = requests.post(url, data=json.dumps(data), headers=headers)
 
-        print("STATUS CODE:", r.status_code)
+        print("STATUS:", r.status_code)
         print("RESPONSE:", r.text)
 
         res = r.json()
 
-        # ✅ success check
-        if res.get("result") == 100:
-            return res
+        if res.get("status") == 200:
+            return res["data"]
         else:
             print("OxaPay Error:", res)
             return None
 
     except Exception as e:
-        print("Payment creation error:", e)
+        print("Error:", e)
         return None
 
 
@@ -53,20 +53,25 @@ def create_payment(user_id: str, network: str):
 def check_payment_status(track_id: str):
     url = "https://api.oxapay.com/v1/payment/inquiry"
 
+    headers = {
+        "merchant_api_key": API_KEY,
+        "Content-Type": "application/json",
+        "User-Agent": "Mozilla/5.0"
+    }
+
     data = {
-        "merchant": API_KEY,
-        "trackId": track_id
+        "track_id": track_id
     }
 
     try:
-        r = requests.post(url, json=data)
+        r = requests.post(url, data=json.dumps(data), headers=headers)
 
-        print("STATUS CODE:", r.status_code)
+        print("STATUS:", r.status_code)
         print("RESPONSE:", r.text)
 
         res = r.json()
 
-        return res.get("status")  # 100 = paid
+        return res.get("data", {}).get("status")
 
     except Exception as e:
         print("Status error:", e)
