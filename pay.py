@@ -1,3 +1,7 @@
+# =========================
+# pay.py (UPDATED FOR /v1/payment API - IN-BOT ADDRESS FLOW)
+# =========================
+
 import requests
 
 API_KEY = "HHQWVKJ-SV2MDEH-QG6KGZQ-B2JM7YT"
@@ -8,12 +12,14 @@ HEADERS = {
 }
 
 
-def create_invoice(user_id: str):
-    url = "https://api.nowpayments.io/v1/invoice"
+# Create payment (returns address + amount)
+def create_payment(user_id: str, pay_currency: str):
+    url = "https://api.nowpayments.io/v1/payment"
 
     data = {
         "price_amount": 1,
         "price_currency": "usd",
+        "pay_currency": pay_currency,  # usdttrc20 / usdtbep20
         "order_id": user_id,
         "order_description": "Test Payment $1"
     }
@@ -22,23 +28,19 @@ def create_invoice(user_id: str):
         r = requests.post(url, json=data, headers=HEADERS)
         return r.json()
     except Exception as e:
-        print("Invoice error:", e)
+        print("Payment creation error:", e)
         return None
 
 
+# Check payment status
 def check_payment_status(payment_id: str):
-    url = f"https://api.nowpayments.io/v1/invoice/{payment_id}"
+    url = f"https://api.nowpayments.io/v1/payment/{payment_id}"
 
     try:
         r = requests.get(url, headers=HEADERS)
         data = r.json()
 
-        payments = data.get("payments", [])
-
-        if not payments:
-            return "waiting"
-
-        return payments[-1].get("payment_status")
+        return data.get("payment_status")
 
     except Exception as e:
         print("Status error:", e)
