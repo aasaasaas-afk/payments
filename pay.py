@@ -4,7 +4,7 @@
 
 import requests
 
-API_KEY = "ZRDRKF-PQLS5Q-BVYUXM-JI5QPZ"
+API_KEY = "NLQIPG-8SOFHX-VPRQZ5-MQA7H9"
 
 
 # 🔥 Create payment (returns address + amount + trackId)
