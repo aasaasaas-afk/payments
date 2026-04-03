@@ -21,7 +21,7 @@ def create_payment(user_id: str):
     }
 
     data = {
-        "label": f"user_{user_id}"[:20]  # max 20 chars
+        "label": f"user-{user_id}"[:20]
     }
 
     try:
