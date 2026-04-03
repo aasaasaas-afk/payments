@@ -16,7 +16,7 @@ dp = Dispatcher(bot)
 
 # store user data
 user_address = {}
-expected_amount = 1.0  # $1
+expected_amount = 5.0  # $1
 
 
 @dp.message_handler(commands=["start"])
