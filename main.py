@@ -9,7 +9,7 @@ from aiogram.utils import executor
 
 from pay import create_payment, check_payment_status
 
-BOT_TOKEN = "YOUR_BOT_TOKEN"
+BOT_TOKEN = "8775877729:AAER8B3a4FnLJW59ihfkZ49hfnF880AOPvg"
 
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher(bot)
