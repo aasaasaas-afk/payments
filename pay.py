@@ -1,51 +1,72 @@
 # =========================
-# pay.py (UPDATED FOR /v1/payment API - IN-BOT ADDRESS FLOW)
+# pay.py (OXAPAY VERSION)
 # =========================
 
 import requests
 
-API_KEY = "HHQWVKJ-SV2MDEH-QG6KGZQ-B2JM7YT"
-
-HEADERS = {
-    "x-api-key": API_KEY,
-    "Content-Type": "application/json"
-}
+API_KEY = "ZRDRKF-PQLS5Q-BVYUXM-JI5QPZ"
 
 
-# Create payment (returns address + amount)
-def create_payment(user_id: str, pay_currency: str):
-    url = "https://api.nowpayments.io/v1/payment"
+# 🔥 Create payment (returns address + amount + trackId)
+def create_payment(user_id: str, network: str):
+    url = "https://api.oxapay.com/v1/payment"
 
     data = {
-        "price_amount": 100,
-        "price_currency": "usd",
-        "pay_currency": pay_currency,
-        "order_id": user_id,
-        "order_description": "Test Payment $1"
+        "merchant": API_KEY,
+        "amount": 1,  # ✅ you can keep low amount here (1–5 works)
+        "currency": "USD",
+        "lifeTime": 30,
+        "feePaidByPayer": 1,
+        "underPaidCover": 2,
+        "description": f"User {user_id} payment"
     }
 
+    # 🔥 Network handling
+    if network == "trc20":
+        data["network"] = "TRC20"
+        data["currency"] = "USDT"
+    elif network == "bep20":
+        data["network"] = "BEP20"
+        data["currency"] = "USDT"
+
     try:
-        r = requests.post(url, json=data, headers=HEADERS)
+        r = requests.post(url, json=data)
 
         print("STATUS CODE:", r.status_code)
-        print("RESPONSE:", r.text)  # 🔥 IMPORTANT
+        print("RESPONSE:", r.text)
 
-        return r.json()
+        res = r.json()
+
+        # ✅ success check
+        if res.get("result") == 100:
+            return res
+        else:
+            print("OxaPay Error:", res)
+            return None
 
     except Exception as e:
         print("Payment creation error:", e)
         return None
 
 
-# Check payment status
-def check_payment_status(payment_id: str):
-    url = f"https://api.nowpayments.io/v1/payment/{payment_id}"
+# 🔥 Check payment status
+def check_payment_status(track_id: str):
+    url = "https://api.oxapay.com/v1/payment/inquiry"
+
+    data = {
+        "merchant": API_KEY,
+        "trackId": track_id
+    }
 
     try:
-        r = requests.get(url, headers=HEADERS)
-        data = r.json()
+        r = requests.post(url, json=data)
 
-        return data.get("payment_status")
+        print("STATUS CODE:", r.status_code)
+        print("RESPONSE:", r.text)
+
+        res = r.json()
+
+        return res.get("status")  # 100 = paid
 
     except Exception as e:
         print("Status error:", e)
